@@ -8,7 +8,7 @@ const files = [
 	'*/*.html',
 ];
 
-gulp.task('default', ['lint', 'test-continuous', 'watch']);
+gulp.task('default', ['lint', 'karma-continuous', 'watch']);
 gulp.task('lint', lint);
 gulp.task('test', ['lint', 'karma']);
 gulp.task('karma', karma);
