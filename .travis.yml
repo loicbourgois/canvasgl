@@ -6,6 +6,8 @@ node_js:
 
 script: gulp test
 
+sudo: enabled
+
 #addons:
 #  chrome: stable
 #  firefox: latest
