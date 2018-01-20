@@ -1,16 +1,16 @@
 language: node_js
 node_js:
-	- "iojs"
-	- "9"
+  - "iojs"
+  - "9"
 #before_script:
-	- npm install
+#  - npm install
 
 script: gulp test
 
 addons:
-	chrome: stable
-	firefox: latest
+  chrome: stable
+  firefox: latest
 
 #cache:
-#	directories:
-#		- "node_modules"
+#  directories:
+#    - "node_modules"
