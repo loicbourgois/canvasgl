@@ -8,8 +8,8 @@ script: gulp test
 
 sudo: enabled
 
-#addons:
-#  chrome: stable
+addons:
+  chrome: stable
 #  firefox: latest
 
 #cache:
