@@ -7,9 +7,9 @@ node_js:
 
 script: gulp test
 
-addons:
-  chrome: stable
-  firefox: latest
+#addons:
+#  chrome: stable
+#  firefox: latest
 
 #cache:
 #  directories:
