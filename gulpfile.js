@@ -10,8 +10,9 @@ const files = [
 
 gulp.task('default', ['lint', 'test-continuous', 'watch']);
 gulp.task('lint', lint);
-gulp.task('test', test);
-gulp.task('test-continuous', testContinuous);
+gulp.task('test', ['lint', 'karma']);
+gulp.task('karma', karma);
+gulp.task('karma-continuous', karmaContinuous);
 gulp.task('watch', watch);
 
 function lint() {
@@ -20,14 +21,14 @@ function lint() {
 		.pipe(eslint.format());
 }
 
-function test(done) {
+function karma(done) {
 	new Server({
 		configFile: __dirname + '/karma.conf.js',
 		singleRun: true
 	}, done).start();
 }
 
-function testContinuous(done) {
+function karmaContinuous(done) {
 	new Server({
 		configFile: __dirname + '/karma.conf.js',
 		singleRun: false
@@ -35,5 +36,5 @@ function testContinuous(done) {
 }
 
 function watch() {
-	return gulp.watch(files, ['lint', 'test-continuous']);
+	return gulp.watch(files, ['lint', 'karma-continuous']);
 }

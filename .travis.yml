@@ -1,0 +1,17 @@
+language: node_js
+
+node_js:
+  - "9"
+
+script: gulp test
+
+sudo: enabled
+
+addons:
+  chrome: stable
+
+# https://swizec.com/blog/how-to-run-javascript-tests-in-chrome-on-travis/swizec/6647
+before_install:
+  - export CHROME_BIN=chromium-browser
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
