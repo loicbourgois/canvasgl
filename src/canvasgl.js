@@ -1,31 +1,34 @@
 'use strict';
 
-function ProgramWrapper(context) {
-	var this_ = this;
-	this_.context = context;
-	this_.gl = this_.context.gl;
-	this_.source = {};
-	this_.shader = {};
+class ProgramWrapper {
 
-	this_.setFragmentSource = function(source) {
-		this_.source.fragment = source;
-		this_.shader.fragment = this_.createShader(
-			this_.gl,
-			this_.gl.FRAGMENT_SHADER,
+	constructor(context) {
+		this.context = context;
+		this.gl = this.context.gl;
+		this.canvas = this.context.gl.canvas;
+		this.source = {};
+		this.shader = {};
+	}
+
+	setFragmentSource (source) {
+		this.source.fragment = source;
+		this.shader.fragment = this.createShader(
+			this.gl,
+			this.gl.FRAGMENT_SHADER,
 			source
 		);
-	};
+	}
 
-	this_.setVertexSource = function(source) {
-		this_.source.vertex = source;
-		this_.shader.vertex = this_.createShader(
-			this_.gl,
-			this_.gl.VERTEX_SHADER,
+	setVertexSource (source) {
+		this.source.vertex = source;
+		this.shader.vertex = this.createShader(
+			this.gl,
+			this.gl.VERTEX_SHADER,
 			source
 		);
-	};
+	}
 
-	this_.createShader = function(gl, type, source) {
+	createShader (gl, type, source) {
 		var shader = gl.createShader(type);
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
@@ -34,12 +37,12 @@ function ProgramWrapper(context) {
 			return shader;
 		}
 		gl.deleteShader(shader);
-	};
+	}
 
-	this_.createProgram = function(gl, vertexShader, fragmentShader) {
+	createProgram (gl, vertexShader, fragmentShader) {
 		var program = gl.createProgram();
-		vertexShader ? null : vertexShader = this_.shader.vertex;
-		fragmentShader ? null : fragmentShader = this_.shader.fragment;
+		vertexShader ? null : vertexShader = this.shader.vertex;
+		fragmentShader ? null : fragmentShader = this.shader.fragment;
 		gl.attachShader(program, vertexShader);
 		gl.attachShader(program, fragmentShader);
 		gl.linkProgram(program);
@@ -48,75 +51,82 @@ function ProgramWrapper(context) {
 			return program;
 		}
 		gl.deleteProgram(program);
-	};
+	}
 
-	this_.getProgram = function () {
-		this_.program = this_.createProgram(
-			this_.gl,
-			this_.vertexShader,
-			this_.fragmentShader
+	getProgram () {
+		this.program = this.createProgram(
+			this.gl,
+			this.vertexShader,
+			this.fragmentShader
 		);
-		return this_.program;
-	};
+		return this.program;
+	}
 }
 
 
-function FillRectProgramWrapper(context) {
-	var this_ = this;
-	ProgramWrapper.call(this_, context);
+class FillRectProgramWrapper extends ProgramWrapper {
 
-	this_.setVertexSource(`#version 300 es
-		precision mediump float;
-		in vec2 pos;
-		void main() {
-			gl_Position = vec4((vec2(1,1)*(pos) * vec2(2,-2) / vec2(512, 512) - vec2(1,-1)) , 1, 1);
-		}
-	`);
-	this_.setFragmentSource(`#version 300 es
-		precision mediump float;
-		out vec4 outColor;
-		void main() {
-			outColor = vec4(0, 0, 0, 1);
-		}
-	`);
+	constructor(context_) {
+		super(context_);
+		this.setVertexSource(`#version 300 es
+			precision mediump float;
+			uniform vec2 canvasDimensions;
+			in vec2 pos;
 
-	var positionAttributeLocation = this_.gl.getAttribLocation(this_.getProgram(), 'pos');
-	var positionBuffer = this_.gl.createBuffer();
-	this_.gl.bindBuffer(context.gl.ARRAY_BUFFER, positionBuffer);
+			void main() {
+				gl_Position = vec4((pos * vec2(2,-2) / canvasDimensions - vec2(1,-1)) , 1, 1);
+			}
+		`);
+		this.setFragmentSource(`#version 300 es
+			precision mediump float;
+			out vec4 outColor;
+			void main() {
+				outColor = vec4(0, 0, 0, 1);
+			}
+		`);
+		var program = this.getProgram();
+		this.positionAttributeLocation = this.gl.getAttribLocation(program, 'pos');
+		this.canvasDimensionsLocation = this.gl.getUniformLocation(program, 'canvasDimensions');
 
-	var vao = context.gl.createVertexArray();
-	context.gl.bindVertexArray(vao);
-	context.gl.enableVertexAttribArray(positionAttributeLocation);
+		this.positionBuffer = this.gl.createBuffer();
+		this.gl.bindBuffer(this.context.gl.ARRAY_BUFFER, this.positionBuffer);
 
-	var size = 2;          // 2 components per iteration
-	var type = context.gl.FLOAT;   // the data is 32bit floats
-	var normalize = false; // don't normalize the data
-	var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-	var offset = 0;        // start at the beginning of the buffer
-	context.gl.vertexAttribPointer(
-		positionAttributeLocation,
-		size,
-		type,
-		normalize,
-		stride,
-		offset
-	);
+		this.vao = this.context.gl.createVertexArray();
+		this.context.gl.bindVertexArray(this.vao);
+		this.context.gl.enableVertexAttribArray(this.positionAttributeLocation);
 
-	context.gl.useProgram(this_.getProgram());
+		this.size = 2;          // 2 components per iteration
+		this.type = this.context.gl.FLOAT;   // the data is 32bit floats
+		this.normalize = false; // don't normalize the data
+		this.stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+		this.offset = 0;        // start at the beginning of the buffer
+		this.context.gl.vertexAttribPointer(
+			this.positionAttributeLocation,
+			this.size,
+			this.type,
+			this.normalize,
+			this.stride,
+			this.offset
+		);
 
-	context.gl.bindVertexArray(vao);
-	var primitiveType = context.gl.TRIANGLES;
-	this_.data = [];
+		this.gl.useProgram(program);
+		this.context.gl.bindVertexArray(this.vao);
+		this.primitiveType = this.context.gl.TRIANGLES;
+		this.data = [];
+	}
 
-	this_.addData = function(data) {
-		this_.data.push(...data);
-	};
 
-	this_.blit = function () {
-		context.gl.viewport(0, 0, context.gl.canvas.width, context.gl.canvas.height);
-		context.gl.bufferData(context.gl.ARRAY_BUFFER, new Float32Array(this_.data), context.gl.STATIC_DRAW);
-		context.gl.drawArrays(primitiveType, offset, this_.data.length/size);
-	};
+	addData (data) {
+		this.data.push(...data);
+	}
+
+
+	blit () {
+		this.gl.uniform2f(this.canvasDimensionsLocation, this.canvas.width, this.canvas.height);
+		this.context.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+		this.context.gl.bufferData(this.context.gl.ARRAY_BUFFER, new Float32Array(this.data), this.context.gl.STATIC_DRAW);
+		this.context.gl.drawArrays(this.primitiveType, this.offset, this.data.length / this.size);
+	}
 }
 
 
