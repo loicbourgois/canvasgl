@@ -4,8 +4,16 @@
 		<meta charset='UTF-8'>
 		<title>Example</title>
 		<style>
+			* {
+				font-family: Sans-Serif;
+			}
+			h1 {
+				font-size: 1.5em;
+			}
+			h2 {
+				font-size: 1.2em;
+			}
 			body {
-				text-align: right;
 				background: #eef;
 			}
 			canvas {
@@ -18,8 +26,15 @@
 		</style>
 	</head>
 	<body>
-		<canvas id='canvas'></canvas>
-		<canvas id='canvasgl'></canvas>
+		<h1>CanvasGL</h1>
+		<h2>fillRect()</h2>
+		<ul>
+			<li><a href='./index.html'>Home</a></li>
+		</ul>
+		<div>
+			<canvas id='canvas'></canvas>
+			<canvas id='canvasgl'></canvas>
+		</div>
 		<script src='../src/canvasgl.js'></script>
 		<script src='../src/utils.js'></script>
 		<script type='text/javascript'>
