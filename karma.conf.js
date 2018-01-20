@@ -54,20 +54,30 @@ module.exports = function(config) {
 		autoWatch: true,
 
 
-		// start these browsers
-		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-		browsers: [
-			'Chrome',
-			//'Firefox'
-		],
-
-
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits
 		singleRun: true,
 
 		// Concurrency level
 		// how many browser should be started simultaneous
-		concurrency: Infinity
+		concurrency: Infinity,
+
+		browserNoActivityTimeout: 60000,
+		browserDisconnectTolerance: 3
 	});
+
+	// start these browsers
+	// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+	// https://swizec.com/blog/how-to-run-javascript-tests-in-chrome-on-travis/swizec/6647
+	if (process.env.TRAVIS) {
+		config.browsers.push('chrome_travis_ci');
+		config.customLaunchers = {
+			chrome_travis_ci: {
+				base: 'Chrome',
+				flags: ['--no-sandbox']
+			}
+		};
+	} else {
+		config.browsers.push('Chrome');
+	}
 };
