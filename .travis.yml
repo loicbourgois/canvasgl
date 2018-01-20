@@ -1,8 +1,7 @@
 language: node_js
+
 node_js:
   - "9"
-#before_script:
-#  - npm install
 
 script: gulp test
 
@@ -10,8 +9,6 @@ sudo: enabled
 
 addons:
   chrome: stable
-#  firefox: latest
 
-#cache:
-#  directories:
-#    - "node_modules"
+before_install:
+  - "export CHROME_BIN=/usr/bin/google-chrome"
