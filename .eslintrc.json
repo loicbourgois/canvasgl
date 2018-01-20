@@ -1,0 +1,48 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true,
+		"node": true
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"globals": {
+		"describe": false,
+		"afterEach": false,
+		"beforeEach": false,
+		"it": false,
+		"Utils": false,
+		"CanvasGL": false,
+		"expect": false
+	},
+	"plugins": [
+		"html"
+	],
+	"rules": {
+		"complexity": [
+			"error",
+			10
+		],
+		"indent": [
+			"error",
+			"tab"
+		],
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"quotes": [
+			"error",
+			"single"
+		],
+		"semi": [
+			"error",
+			"always"
+		],
+		"no-trailing-spaces": ["error"],
+		"no-unused-vars": 0,
+		"keyword-spacing": ["error", { "before": true, "after": true }]
+	}
+}
