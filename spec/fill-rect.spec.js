@@ -144,4 +144,55 @@ describe('fillRect()', function() {
 		var delta = Utils.getDelta(context, contextgl);
 		expect(delta).toBe(0);
 	});
+
+	describe('+ fillStyle', function() {
+		it('should work with random rgb() colors', function() {
+			var canvas = document.getElementById('canvas');
+			var context = canvas.getContext('2d');
+			var canvasgl = new CanvasGL(document.getElementById('canvasgl'));
+			var contextgl = canvasgl.getContext('2d');
+			var contexts = [contextgl, context];
+			var canvass = [canvasgl, canvas];
+			var rands = [];
+			var w = Utils.getRandom(100, 1000);
+			var h = Utils.getRandom(100, 1000);
+			var minW = 1;
+			var maxW = w - minW;
+			var minH = 1;
+			var maxH = h - minH;
+			var count = 100000;
+			var i = 0;
+			for (i = 0 ; i < count ; i++) {
+				rands.push([
+					Utils.getRandom(0, 255),
+					Utils.getRandom(0, 255),
+					Utils.getRandom(0, 255),
+					Utils.getRandom(minW, maxW*(1-0.125)),
+					Utils.getRandom(minH, maxH*(1-0.125)),
+					Utils.getRandom(minW, maxW*0.125),
+					Utils.getRandom(minH, maxH*0.125)
+				]);
+			}
+			var times = [];
+			contexts.forEach(function(context) {
+				context.canvas.setAttribute('height', h);
+				context.canvas.setAttribute('width', w);
+				context.canvas.style.height  = h +'px';
+				context.canvas.style.width  = w +'px';
+				var t0 = performance.now();
+				for (i = 0 ; i < count ; i++) {
+					context.fillStyle = `rgb(${rands[i][0]}, ${rands[i][1]}, ${rands[i][2]})`;
+					context.fillRect(rands[i][3], rands[i][4], rands[i][5], rands[i][6]);
+				}
+				if (context.blit) {
+					context.blit();
+				}
+				var t1 = performance.now();
+				var time = t1 - t0;
+				times.push(time);
+			});
+			var delta = Utils.getDelta(context, contextgl);
+			expect(delta).toBe(0);
+		});
+	});
 });

@@ -70,21 +70,32 @@ class FillRectProgramWrapper extends ProgramWrapper {
 		super(context_);
 		this.setVertexSource(`#version 300 es
 			precision mediump float;
+
 			uniform vec2 canvasDimensions;
+
 			in vec2 pos;
+			in vec4 color;
+
+			out vec4 vColor;
 
 			void main() {
 				gl_Position = vec4((pos * vec2(2,-2) / canvasDimensions - vec2(1,-1)) , 1, 1);
+				vColor = color;
 			}
 		`);
 		this.setFragmentSource(`#version 300 es
 			precision mediump float;
+
+			in vec4 vColor;
+
 			out vec4 outColor;
+
 			void main() {
-				outColor = vec4(0, 0, 0, 1);
+				outColor = vColor;
 			}
 		`);
 		var program = this.getProgram();
+		this.colorAttributeLocation = this.gl.getAttribLocation(program, 'color');
 		this.positionAttributeLocation = this.gl.getAttribLocation(program, 'pos');
 		this.canvasDimensionsLocation = this.gl.getUniformLocation(program, 'canvasDimensions');
 
@@ -94,19 +105,26 @@ class FillRectProgramWrapper extends ProgramWrapper {
 		this.vao = this.context.gl.createVertexArray();
 		this.context.gl.bindVertexArray(this.vao);
 		this.context.gl.enableVertexAttribArray(this.positionAttributeLocation);
+		this.context.gl.enableVertexAttribArray(this.colorAttributeLocation);
 
-		this.size = 2;          // 2 components per iteration
-		this.type = this.context.gl.FLOAT;   // the data is 32bit floats
-		this.normalize = false; // don't normalize the data
-		this.stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-		this.offset = 0;        // start at the beginning of the buffer
+		this.size = 6;
+
+
 		this.context.gl.vertexAttribPointer(
 			this.positionAttributeLocation,
-			this.size,
-			this.type,
-			this.normalize,
-			this.stride,
-			this.offset
+			2,
+			this.context.gl.FLOAT,
+			false,
+			4*this.size,
+			4*0
+		);
+		this.context.gl.vertexAttribPointer(
+			this.colorAttributeLocation,
+			4,
+			this.context.gl.FLOAT,
+			false,
+			4*this.size,
+			4*2
 		);
 
 		this.gl.useProgram(program);
@@ -148,20 +166,26 @@ class ContextGL2 {
 		this.instructions = [];
 
 
-
 		this.programs = [];
 		this.programs[this.PROGRAM_FILL_RECT] = new FillRectProgramWrapper(this);
+		this.programs[this.PROGRAM_FILL_RECT].context.fillStyle = 'rgb(0,0,0)';
 	}
 
 	fillRect (x, y, w, h) {
+		var regexp = /[-]{0,1}[\d]*[.]{0,1}[\d]+/g;
+		var color = this.programs[this.PROGRAM_FILL_RECT].context.fillStyle.match(regexp);
+		var r = parseFloat(color[0])/255.0;
+		var g = parseFloat(color[1])/255.0;
+		var b = parseFloat(color[2])/255.0;
+		var a = color[3] ? parseFloat(color[3]) : 1;
 		this.programs[this.PROGRAM_FILL_RECT].addData(
 			[
-				x, y,
-				x+w, y,
-				x+w, y+h,
-				x, y,
-				x, y+h,
-				x+w, y+h
+				x, y, r, g, b, a,
+				x+w, y, r, g, b, a,
+				x+w, y+h, r, g, b, a,
+				x, y, r, g, b, a,
+				x, y+h, r, g, b, a,
+				x+w, y+h, r, g, b, a
 			]
 		);
 		//this_.programs[PROGRAM_FILL_RECT].use(x, y, w, h);

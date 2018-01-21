@@ -1,6 +1,11 @@
 class Utils {
+
+	static getRandomFloat(max, min) {
+		return parseFloat(Math.random() * (parseFloat(max - min)) + parseFloat(min));
+	}
+
 	static getRandom(max, min) {
-		return parseInt(Math.random() * (parseFloat(max - min)) + parseFloat(min));
+		return parseInt(Utils.getRandomFloat(max, min));
 	}
 
 	static getDelta(context1, context2) {
