@@ -1,0 +1,19 @@
+* {
+	font-family: Sans-Serif;
+}
+h1 {
+	font-size: 1.5em;
+}
+h2 {
+	font-size: 1.2em;
+}
+body {
+	background: #eef;
+}
+canvas {
+	width: 512px;
+	height: 512px;
+	border: 1px solid #ddd;
+	margin: 0;
+	padding: 0;
+}
