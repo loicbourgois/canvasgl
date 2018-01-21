@@ -100,7 +100,7 @@ describe('fillRect()', function() {
 		expect(delta).toBe(0);
 	});
 
-	it('should work with random dimensions and be faster', function() {
+	it('should work with random dimensions', function() {
 		var canvas = document.getElementById('canvas');
 		var context = canvas.getContext('2d');
 		var canvasgl = new CanvasGL(document.getElementById('canvasgl'));
@@ -143,6 +143,5 @@ describe('fillRect()', function() {
 		});
 		var delta = Utils.getDelta(context, contextgl);
 		expect(delta).toBe(0);
-		expect(times[0]).toBeLessThan(times[1]);
 	});
 });
